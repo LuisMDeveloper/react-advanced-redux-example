@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   isCartDetailsVisible: false,
-  notification: null,
+  notification: {},
 }
 
 const uiStore = createSlice({

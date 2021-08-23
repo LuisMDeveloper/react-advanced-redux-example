@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import Notification from './components/UI/Notification'
 import { showNotification } from './store/uiStore'
+import { fetchCartData, sendCartData } from './thunks'
 
 function App() {
   const dispatch = useDispatch()
@@ -13,57 +14,31 @@ function App() {
   const notification = useSelector((state) => state.ui.notification)
 
   useEffect(() => {
-    let notificationTimer = null
+    dispatch(fetchCartData())
+  }, [])
+
+  useEffect(() => {
     const timer = setTimeout(() => {
-      dispatch(
-        showNotification({
-          status: 'pending',
-          title: 'Pending...',
-          message: 'Sending request...',
-        })
-      )
-      const sendData = async () => {
-        const response = await fetch(
-          'https://react-example-f7ba1-default-rtdb.firebaseio.com/cart.json',
-          {
-            method: 'PUT',
-            body: JSON.stringify(cartState),
-          }
-        )
-
-        if (!response.ok) {
-          throw new Error('Something went wrong!')
-        }
-        dispatch(
-          showNotification({
-            status: 'success',
-            title: 'Success',
-            message: 'Request succeeded',
-          })
-        )
+      if (cartState.updated) {
+        dispatch(sendCartData(cartState))
       }
-      sendData()
-        .then(() => {
-          notificationTimer = setTimeout(() => {
-            dispatch(showNotification(null))
-          }, 3000)
-        })
-        .catch(() => {
-          dispatch(
-            showNotification({
-              status: 'error',
-              title: 'Error',
-              message: 'Something went wrong!',
-            })
-          )
-        })
     }, 1000)
-
     return () => {
       clearTimeout(timer)
-      clearTimeout(notificationTimer)
     }
   }, [cartState, dispatch])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (notification.status !== 'error') {
+        dispatch(showNotification(null))
+      }
+    }, 3000)
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [notification])
+
   return (
     <>
       {notification.status && (
