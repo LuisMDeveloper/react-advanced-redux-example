@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   isCartDetailsVisible: false,
+  notification: null,
 }
 
 const uiStore = createSlice({
@@ -11,9 +12,12 @@ const uiStore = createSlice({
     toggleCartDetails(state) {
       state.isCartDetailsVisible = !state.isCartDetailsVisible
     },
+    showNotification(state, action) {
+      state.notification = { ...action.payload }
+    },
   },
 })
 
-export const { toggleCartDetails } = uiStore.actions
+export const { toggleCartDetails, showNotification } = uiStore.actions
 
 export const uiStoreReducer = uiStore.reducer
